@@ -20,7 +20,7 @@ public class RatesUtil {
 
     private final StringRedisTemplate redisTemplate;
 
-    @Scheduled(fixedRate = 6000_000)
+    @Scheduled(cron = "0 0 * * * *")
     public void getCurrencyRates() {
         try {
             for (CurrencyEnum currency : CurrencyEnum.values()) {

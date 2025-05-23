@@ -1,12 +1,13 @@
 package com.exchanger.controller;
 
 import com.exchanger.common.StandardResponse;
-import com.exchanger.rest.response.ConversionResponse;
 import com.exchanger.rest.response.ConversionHistoryResponse;
+import com.exchanger.rest.response.ConversionResponse;
 import com.exchanger.service.ExchangeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,13 +16,15 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequestMapping("/exchange")
@@ -69,7 +72,6 @@ public class ExchangeController {
             @PathVariable String currency1,
             @Parameter(description = "Target currency (USD, EUR, GBP)", example = "EUR")
             @PathVariable String currency2) {
-
         return StandardResponse.success("Success", exchangeService.getConvertedAmount(amount, currency1, currency2));
     }
 
@@ -95,5 +97,24 @@ public class ExchangeController {
             ldt = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
         }
         return StandardResponse.success("Success", exchangeService.getConversionHistory(id, ldt, pageable));
+    }
+
+    @Operation(
+            summary = "Upload multiple CSV files",
+            description = "Accepts multiple CSV files, each containing rows of `amount`, `fromCurrency`, and `toCurrency`. Parses them into UploadRequest objects and returns the conversion results."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "CSV files parsed and processed successfully",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ConversionResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad request or file parse error",
+                    content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<StandardResponse<List<ConversionResponse>>> uploadCsvFiles(
+            @Parameter(description = "Multiple CSV files", required = true,
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
+            @RequestPart("files") MultipartFile[] files) {
+        return StandardResponse.success("Success", exchangeService.getBulkConvertedAmount(files));
     }
 }
