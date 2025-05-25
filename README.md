@@ -22,7 +22,7 @@ This api gets you the currency rate of currency1 over currency2.
 **2-/exchange/{amount}/{currency1}/{currency2} -> GET**  
 This api gets the entered amount and returns the converted amount by using the rate of given currencies and unique conversionId.  
 *curl string =* "curl -X 'GET' \  'http://localhost:8080/exchange/100/USD/EUR' \  -H 'accept: application/json'"  
-*response=* "{
+*response=* "{  
   "code": 200,  
   "message": "Success",  
   "data": {  
