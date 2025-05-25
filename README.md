@@ -188,3 +188,11 @@ This api lets you convert from single or multiple **csv** files added by the use
     }  
   ]  
 }" 
+
+***Dev Notes:***
+-H2 inmemory db is being used to save conversion operations.
+-Project specific error definitions are added.
+-General response payload structure is created.
+-Generic http request sender is defined.
+-Strategy pattern is added for each http type.
+-Mapstruct is added for mapping purposes.
