@@ -196,3 +196,4 @@ This api lets you convert from single or multiple **csv** files added by the use
 -Generic http request sender is defined.  
 -Strategy pattern is added for each http type.  
 -Mapstruct is added for mapping purposes.  
+-For easy API calls OpenAPI(Swagger) is added.
