@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class HttpUtil {
 
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private static HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
 
     public static <T> T sendRequest(String url, HttpMethod method, Map<String, String> headers, String body,
