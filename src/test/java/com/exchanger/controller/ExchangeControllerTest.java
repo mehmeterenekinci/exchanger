@@ -55,9 +55,10 @@ class ExchangeControllerTest {
     }
 
     @Test
-    void testGetConversions() throws Exception {
+    void testGetConversions_withValidDateAndSort_shouldReturnSuccess() throws Exception {
         ConversionHistoryResponse mockHistory = new ConversionHistoryResponse();
         PageImpl<ConversionHistoryResponse> mockPage = new PageImpl<>(List.of(mockHistory));
+
         Mockito.when(exchangeService.getConversionHistory(any(), any(), any(Pageable.class)))
                 .thenReturn(mockPage);
 
@@ -65,10 +66,19 @@ class ExchangeControllerTest {
                         .param("id", "1")
                         .param("date", "2024-05-01")
                         .param("size", "1")
-                        .param("page", "0"))
+                        .param("page", "0")
+                        .param("sort", "createdAt,asc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success"))
                 .andExpect(jsonPath("$.data.content", hasSize(1)));
+    }
+
+    @Test
+    void testGetConversions_withInvalidDate_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/exchange")
+                        .param("date", "01-05-2024"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid format. Correct format: yyyy-MM-dd"));
     }
 
     @Test

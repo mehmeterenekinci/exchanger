@@ -1,6 +1,8 @@
 package com.exchanger.controller;
 
+import com.exchanger.common.ExchangerException;
 import com.exchanger.common.StandardResponse;
+import com.exchanger.enums.ExchangerError;
 import com.exchanger.rest.response.ConversionHistoryResponse;
 import com.exchanger.rest.response.ConversionResponse;
 import com.exchanger.service.ExchangeService;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -94,7 +98,17 @@ public class ExchangeController {
             @ParameterObject Pageable pageable) {
         LocalDateTime ldt = null;
         if (date != null && !date.isBlank()) {
-            ldt = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
+            try {
+                ldt = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
+            } catch (DateTimeParseException e) {
+                throw new ExchangerException(ExchangerError.INVALID_DATE_FORMAT);
+            }
+        }
+        for (Sort.Order order : pageable.getSort()) {
+            String direction = order.getDirection().name().toLowerCase();
+            if (!direction.equals("asc") && !direction.equals("desc")) {
+                throw new ExchangerException(ExchangerError.INVALID_SORTING_ORDER);
+            }
         }
         return StandardResponse.success("Success", exchangeService.getConversionHistory(id, ldt, pageable));
     }

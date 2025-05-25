@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RatesUtil {
 
-    public static final String ACCESS_KEY = "348a35f4aee94c6c62db3ef207e5f94a";
+    public static final String ACCESS_KEY = "e5a236f1e98b3d2a6e836f7ea9092dad";
     public static final String BASE_URL = "http://api.currencylayer.com/";
     public static final String ENDPOINT = "live";
 
